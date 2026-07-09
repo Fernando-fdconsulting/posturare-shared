@@ -8,6 +8,7 @@ import { Card } from '../ui/card';
 import { Checkbox } from '../ui/checkbox';
 import { Progress } from '../ui/progress';
 import { useToast } from '../ui/use-toast';
+import SignaturePad from './SignaturePad';
 import { formatCPF, formatPhone, formatCEP, removeMask, validateCPF } from '../utils/maskUtils';
 import { fetchAddressByCEP } from '../utils/viaCepService';
 
@@ -89,7 +90,9 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
 
     aceite_termo: false,
     autoriza_fotos: false,
+    autoriza_divulgacao_marketing: false,
     assinatura_digital: '',
+    assinatura_imagem: '',
   });
 
   const update = (campo, valor) => setData((prev) => ({ ...prev, [campo]: valor }));
@@ -122,7 +125,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
     }
     if (s === 'termo') {
       if (!data.aceite_termo) return 'É necessário aceitar o termo para concluir.';
-      if (!data.assinatura_digital.trim()) return 'Assinatura digital (nome) é obrigatória.';
+      if (!data.assinatura_imagem) return 'Assine no campo de assinatura para concluir.';
     }
     return null;
   };
@@ -152,6 +155,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
       cep: removeMask(data.cep),
       contato_emergencia_telefone: removeMask(data.contato_emergencia_telefone),
       intensidade_dor: data.intensidade_dor ? parseInt(data.intensidade_dor, 10) : null,
+      assinatura_digital: data.nome_completo_informado,
     };
 
     Object.keys(payload).forEach((k) => {
@@ -733,13 +737,26 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           </span>
         </label>
 
+        <label className="flex items-start gap-2 text-white">
+          <Checkbox
+            checked={data.autoriza_divulgacao_marketing}
+            onCheckedChange={(v) => update('autoriza_divulgacao_marketing', !!v)}
+            className="mt-1"
+          />
+          <span className="text-sm">
+            Autorizo o uso de minhas imagens para divulgação nas redes sociais e materiais de
+            marketing da Posturare.
+          </span>
+        </label>
+
         <div className="space-y-2">
-          <Label className="text-white">Assinatura digital (digite seu nome completo) *</Label>
-          <Input
-            value={data.assinatura_digital}
-            onChange={(e) => update('assinatura_digital', e.target.value)}
-            className={inputCls}
-            placeholder="Seu nome completo"
+          <Label className="text-white">Assinatura *</Label>
+          {data.nome_completo_informado && (
+            <p className="text-xs text-gray-400">Assinando como: {data.nome_completo_informado}</p>
+          )}
+          <SignaturePad
+            value={data.assinatura_imagem}
+            onChange={(dataUri) => update('assinatura_imagem', dataUri)}
           />
         </div>
       </div>
