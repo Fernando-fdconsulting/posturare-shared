@@ -25,6 +25,11 @@ const stripDDI55 = (tel) => {
 /**
  * Wizard multi-step de Anamnese — reutilizável entre posturare-crm e posturare-app.
  *
+ * Usa classes semânticas do shadcn (text-foreground, bg-background, border-border etc.)
+ * em vez de cores fixas, para se adaptar automaticamente ao tema do app consumidor
+ * (CRM = dark, posturare-app = claro/marca Posturare) via CSS variables definidas
+ * no index.css de cada projeto.
+ *
  * Props:
  * - dadosIniciais: { nome, cpf, telefone }    -> valores atuais do lead/cliente (pré-preencher campos sensíveis)
  * - modo: 'manual' (CRM) | 'publico' (app público)
@@ -196,11 +201,10 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
     }
   };
 
-  const inputCls = 'bg-white/5 border-white/10 text-white';
   const selectCls =
-    'flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 [&_option]:text-black';
+    'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring [&_option]:text-foreground';
   const textareaCls =
-    'flex min-h-[80px] w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500';
+    'flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring';
 
   const renderStep = () => {
     const s = steps[step].id;
@@ -218,55 +222,50 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
     return (
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label className="text-white">Nome completo *</Label>
+          <Label>Nome completo *</Label>
           <Input
             value={data.nome_completo_informado}
             onChange={(e) => update('nome_completo_informado', e.target.value)}
-            className={inputCls}
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label className="text-white">CPF *</Label>
+            <Label>CPF *</Label>
             <Input
               value={formatCPF(data.cpf_informado)}
               onChange={(e) => update('cpf_informado', e.target.value)}
-              className={inputCls}
               placeholder="000.000.000-00"
             />
           </div>
           <div className="space-y-2">
-            <Label className="text-white">Telefone *</Label>
+            <Label>Telefone *</Label>
             <Input
               value={formatPhone(data.telefone_informado)}
               onChange={(e) => update('telefone_informado', e.target.value)}
-              className={inputCls}
               placeholder="(11) 99999-9999"
             />
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label className="text-white">Data de nascimento *</Label>
+            <Label>Data de nascimento *</Label>
             <Input
               type="date"
               value={data.data_nascimento}
               onChange={(e) => update('data_nascimento', e.target.value)}
-              className={`${inputCls} [&::-webkit-calendar-picker-indicator]:filter-invert`}
             />
           </div>
           <div className="space-y-2">
-            <Label className="text-white">Profissão</Label>
+            <Label>Profissão</Label>
             <Input
               value={data.profissao}
               onChange={(e) => update('profissao', e.target.value)}
-              className={inputCls}
             />
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label className="text-white">Estado civil</Label>
+            <Label>Estado civil</Label>
             <select
               value={data.estado_civil}
               onChange={(e) => update('estado_civil', e.target.value)}
@@ -281,7 +280,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
             </select>
           </div>
           <div className="space-y-2">
-            <Label className="text-white">Como nos conheceu?</Label>
+            <Label>Como nos conheceu?</Label>
             <select
               value={data.como_conheceu}
               onChange={(e) => update('como_conheceu', e.target.value)}
@@ -307,92 +306,83 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label className="text-white">CEP</Label>
+            <Label>CEP</Label>
             <div className="relative">
               <Input
                 value={formatCEP(data.cep)}
                 onChange={(e) => update('cep', e.target.value)}
                 onBlur={handleCepBlur}
-                className={inputCls}
                 placeholder="00000-000"
               />
               {cepLoading && (
-                <Loader2 className="h-4 w-4 animate-spin text-gray-400 absolute right-3 top-3" />
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground absolute right-3 top-3" />
               )}
             </div>
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <Label className="text-white">Endereço</Label>
+            <Label>Endereço</Label>
             <Input
               value={data.endereco}
               onChange={(e) => update('endereco', e.target.value)}
-              className={inputCls}
             />
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label className="text-white">Número</Label>
+            <Label>Número</Label>
             <Input
               value={data.endereco_numero}
               onChange={(e) => update('endereco_numero', e.target.value)}
-              className={inputCls}
             />
           </div>
           <div className="space-y-2">
-            <Label className="text-white">Complemento</Label>
+            <Label>Complemento</Label>
             <Input
               value={data.complemento}
               onChange={(e) => update('complemento', e.target.value)}
-              className={inputCls}
             />
           </div>
           <div className="space-y-2">
-            <Label className="text-white">Bairro</Label>
+            <Label>Bairro</Label>
             <Input
               value={data.bairro}
               onChange={(e) => update('bairro', e.target.value)}
-              className={inputCls}
             />
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-2 sm:col-span-2">
-            <Label className="text-white">Cidade</Label>
+            <Label>Cidade</Label>
             <Input
               value={data.cidade}
               onChange={(e) => update('cidade', e.target.value)}
-              className={inputCls}
             />
           </div>
           <div className="space-y-2">
-            <Label className="text-white">UF</Label>
+            <Label>UF</Label>
             <Input
               value={data.estado}
               onChange={(e) => update('estado', e.target.value.toUpperCase().slice(0, 2))}
-              className={inputCls}
               maxLength={2}
             />
           </div>
         </div>
 
-        <div className="pt-4 border-t border-white/10">
-          <h4 className="text-white font-semibold mb-3">Contato de emergência</h4>
+        <div className="pt-4 border-t border-border">
+          <h4 className="font-semibold mb-3">Contato de emergência</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-white">Nome</Label>
+              <Label>Nome</Label>
               <Input
                 value={data.contato_emergencia_nome}
                 onChange={(e) => update('contato_emergencia_nome', e.target.value)}
-                className={inputCls}
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-white">Telefone</Label>
+              <Label>Telefone</Label>
               <Input
                 value={formatPhone(data.contato_emergencia_telefone)}
                 onChange={(e) => update('contato_emergencia_telefone', e.target.value)}
-                className={inputCls}
                 placeholder="(11) 99999-9999"
               />
             </div>
@@ -406,7 +396,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
     return (
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label className="text-white">Possui alguma doença diagnosticada?</Label>
+          <Label>Possui alguma doença diagnosticada?</Label>
           <textarea
             value={data.doenca_diagnosticada}
             onChange={(e) => update('doenca_diagnosticada', e.target.value)}
@@ -415,7 +405,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-white">Faz uso contínuo de alguma medicação?</Label>
+          <Label>Faz uso contínuo de alguma medicação?</Label>
           <textarea
             value={data.medicacao_continua}
             onChange={(e) => update('medicacao_continua', e.target.value)}
@@ -424,8 +414,8 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           />
         </div>
 
-        <div className="pt-4 border-t border-white/10 space-y-3">
-          <label className="flex items-center gap-2 text-white">
+        <div className="pt-4 border-t border-border space-y-3">
+          <label className="flex items-center gap-2">
             <Checkbox
               checked={data.tem_plano_saude}
               onCheckedChange={(v) => update('tem_plano_saude', !!v)}
@@ -435,16 +425,15 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           {data.tem_plano_saude && (
             <div className="space-y-4 pl-6">
               <div className="space-y-2">
-                <Label className="text-white">Qual plano?</Label>
+                <Label>Qual plano?</Label>
                 <Input
                   value={data.qual_plano_saude}
                   onChange={(e) => update('qual_plano_saude', e.target.value)}
-                  className={inputCls}
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-white">O plano oferece reembolso?</Label>
+                  <Label>O plano oferece reembolso?</Label>
                   <select
                     value={data.plano_oferece_reembolso}
                     onChange={(e) => update('plano_oferece_reembolso', e.target.value)}
@@ -457,7 +446,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-white">Tem interesse em usar reembolso?</Label>
+                  <Label>Tem interesse em usar reembolso?</Label>
                   <select
                     value={data.interesse_reembolso}
                     onChange={(e) => update('interesse_reembolso', e.target.value)}
@@ -480,7 +469,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
   function renderDor() {
     return (
       <div className="space-y-4">
-        <label className="flex items-center gap-2 text-white">
+        <label className="flex items-center gap-2">
           <Checkbox
             checked={data.tem_dor_desconforto}
             onCheckedChange={(v) => update('tem_dor_desconforto', !!v)}
@@ -491,62 +480,59 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
         {data.tem_dor_desconforto && (
           <div className="space-y-4 pl-6">
             <div className="space-y-2">
-              <Label className="text-white">Local da dor</Label>
+              <Label>Local da dor</Label>
               <Input
                 value={data.local_dor}
                 onChange={(e) => update('local_dor', e.target.value)}
-                className={inputCls}
                 placeholder="Ex.: lombar, cervical, joelho direito..."
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-white">Intensidade (0–10)</Label>
+                <Label>Intensidade (0–10)</Label>
                 <Input
                   type="number"
                   min={0}
                   max={10}
                   value={data.intensidade_dor}
                   onChange={(e) => update('intensidade_dor', e.target.value)}
-                  className={inputCls}
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-white">Há quanto tempo?</Label>
+                <Label>Há quanto tempo?</Label>
                 <Input
                   value={data.tempo_dor}
                   onChange={(e) => update('tempo_dor', e.target.value)}
-                  className={inputCls}
                   placeholder="Ex.: 2 semanas, 6 meses..."
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label className="text-white">A dor interfere em:</Label>
+              <Label>A dor interfere em:</Label>
               <div className="grid grid-cols-2 gap-2">
-                <label className="flex items-center gap-2 text-gray-200 text-sm">
+                <label className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Checkbox
                     checked={data.dor_interfere_trabalho}
                     onCheckedChange={(v) => update('dor_interfere_trabalho', !!v)}
                   />
                   Trabalho
                 </label>
-                <label className="flex items-center gap-2 text-gray-200 text-sm">
+                <label className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Checkbox
                     checked={data.dor_interfere_sono}
                     onCheckedChange={(v) => update('dor_interfere_sono', !!v)}
                   />
                   Sono
                 </label>
-                <label className="flex items-center gap-2 text-gray-200 text-sm">
+                <label className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Checkbox
                     checked={data.dor_interfere_atividade}
                     onCheckedChange={(v) => update('dor_interfere_atividade', !!v)}
                   />
                   Atividade física
                 </label>
-                <label className="flex items-center gap-2 text-gray-200 text-sm">
+                <label className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Checkbox
                     checked={data.dor_interfere_lazer}
                     onCheckedChange={(v) => update('dor_interfere_lazer', !!v)}
@@ -564,7 +550,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
   function renderHistorico() {
     return (
       <div className="space-y-4">
-        <label className="flex items-center gap-2 text-white">
+        <label className="flex items-center gap-2">
           <Checkbox
             checked={data.fez_fisioterapia}
             onCheckedChange={(v) => update('fez_fisioterapia', !!v)}
@@ -574,15 +560,14 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
         {data.fez_fisioterapia && (
           <div className="space-y-4 pl-6">
             <div className="space-y-2">
-              <Label className="text-white">Para qual queixa?</Label>
+              <Label>Para qual queixa?</Label>
               <Input
                 value={data.fisio_queixa}
                 onChange={(e) => update('fisio_queixa', e.target.value)}
-                className={inputCls}
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-white">Resultado obtido</Label>
+              <Label>Resultado obtido</Label>
               <select
                 value={data.fisio_resultado}
                 onChange={(e) => update('fisio_resultado', e.target.value)}
@@ -599,7 +584,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
         )}
 
         <div className="space-y-2">
-          <Label className="text-white">Tem interesse em fisioterapia?</Label>
+          <Label>Tem interesse em fisioterapia?</Label>
           <select
             value={data.interesse_fisioterapia}
             onChange={(e) => update('interesse_fisioterapia', e.target.value)}
@@ -614,7 +599,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
         </div>
 
         <div className="space-y-2">
-          <Label className="text-white">Pratica atividade física atualmente?</Label>
+          <Label>Pratica atividade física atualmente?</Label>
           <textarea
             value={data.atividade_fisica_atual}
             onChange={(e) => update('atividade_fisica_atual', e.target.value)}
@@ -623,8 +608,8 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           />
         </div>
 
-        <div className="pt-4 border-t border-white/10 space-y-3">
-          <label className="flex items-center gap-2 text-white">
+        <div className="pt-4 border-t border-border space-y-3">
+          <label className="flex items-center gap-2">
             <Checkbox
               checked={data.praticou_pilates}
               onCheckedChange={(v) => update('praticou_pilates', !!v)}
@@ -633,11 +618,10 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           </label>
           {data.praticou_pilates && (
             <div className="space-y-2 pl-6">
-              <Label className="text-white">Por quanto tempo?</Label>
+              <Label>Por quanto tempo?</Label>
               <Input
                 value={data.tempo_pilates}
                 onChange={(e) => update('tempo_pilates', e.target.value)}
-                className={inputCls}
                 placeholder="Ex.: 6 meses, 2 anos..."
               />
             </div>
@@ -651,7 +635,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
     return (
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label className="text-white">Objetivo principal *</Label>
+          <Label>Objetivo principal *</Label>
           <select
             value={data.objetivo_principal}
             onChange={(e) => update('objetivo_principal', e.target.value)}
@@ -666,7 +650,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           </select>
         </div>
         <div className="space-y-2">
-          <Label className="text-white">Como avalia sua qualidade de vida hoje?</Label>
+          <Label>Como avalia sua qualidade de vida hoje?</Label>
           <select
             value={data.qualidade_vida}
             onChange={(e) => update('qualidade_vida', e.target.value)}
@@ -681,7 +665,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           </select>
         </div>
         <div className="space-y-2">
-          <Label className="text-white">Observações adicionais</Label>
+          <Label>Observações adicionais</Label>
           <textarea
             value={data.observacoes_adicionais}
             onChange={(e) => update('observacoes_adicionais', e.target.value)}
@@ -696,8 +680,8 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
   function renderTermo() {
     return (
       <div className="space-y-4">
-        <div className="p-4 rounded-md bg-white/5 border border-white/10 text-sm text-gray-200 max-h-48 overflow-y-auto">
-          <p className="mb-2 font-semibold text-white">Termo de consentimento e LGPD</p>
+        <div className="p-4 rounded-md bg-muted border border-border text-sm text-muted-foreground max-h-48 overflow-y-auto">
+          <p className="mb-2 font-semibold text-foreground">Termo de consentimento e LGPD</p>
           <p className="mb-2">
             Declaro que as informações prestadas neste formulário são verdadeiras e completas, e
             autorizo a Clínica Posturare a utilizá-las exclusivamente para fins de avaliação,
@@ -714,7 +698,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           </p>
         </div>
 
-        <label className="flex items-start gap-2 text-white">
+        <label className="flex items-start gap-2">
           <Checkbox
             checked={data.aceite_termo}
             onCheckedChange={(v) => update('aceite_termo', !!v)}
@@ -725,7 +709,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           </span>
         </label>
 
-        <label className="flex items-start gap-2 text-white">
+        <label className="flex items-start gap-2">
           <Checkbox
             checked={data.autoriza_fotos}
             onCheckedChange={(v) => update('autoriza_fotos', !!v)}
@@ -737,7 +721,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           </span>
         </label>
 
-        <label className="flex items-start gap-2 text-white">
+        <label className="flex items-start gap-2">
           <Checkbox
             checked={data.autoriza_divulgacao_marketing}
             onCheckedChange={(v) => update('autoriza_divulgacao_marketing', !!v)}
@@ -750,9 +734,9 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
         </label>
 
         <div className="space-y-2">
-          <Label className="text-white">Assinatura *</Label>
+          <Label>Assinatura *</Label>
           {data.nome_completo_informado && (
-            <p className="text-xs text-gray-400">Assinando como: {data.nome_completo_informado}</p>
+            <p className="text-xs text-muted-foreground">Assinando como: {data.nome_completo_informado}</p>
           )}
           <SignaturePad
             value={data.assinatura_imagem}
@@ -771,11 +755,11 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
   const modalContent = (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm">
       <div className="w-full max-w-3xl animate-in fade-in zoom-in duration-200">
-        <Card className="glass-effect border-white/10 flex flex-col max-h-[95vh]">
-          <div className="p-4 sm:p-6 border-b border-white/10 flex items-center justify-between">
+        <Card className="glass-effect flex flex-col max-h-[95vh]">
+          <div className="p-4 sm:p-6 border-b border-border flex items-center justify-between">
             <div>
-              <h2 className="text-lg sm:text-xl font-bold text-white">{titulo}</h2>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <h2 className="text-lg sm:text-xl font-bold">{titulo}</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
                 Passo {step + 1} de {steps.length} · {steps[step].label}
               </p>
             </div>
@@ -783,7 +767,6 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
               variant="ghost"
               size="icon"
               onClick={onCancel}
-              className="text-gray-400 hover:text-white"
               disabled={saving}
             >
               <X className="h-5 w-5" />
@@ -791,18 +774,17 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           </div>
 
           <div className="px-4 sm:px-6 pt-4">
-            <Progress value={progresso} className="h-1.5 bg-white/10" />
+            <Progress value={progresso} className="h-1.5" />
           </div>
 
           <div className="overflow-y-auto p-4 sm:p-6">{renderStep()}</div>
 
-          <div className="p-4 sm:p-6 border-t border-white/10 flex items-center justify-between gap-3">
+          <div className="p-4 sm:p-6 border-t border-border flex items-center justify-between gap-3">
             <Button
               type="button"
               variant="ghost"
               onClick={voltar}
               disabled={step === 0 || saving}
-              className="text-gray-300 hover:text-white"
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
               Voltar
@@ -812,7 +794,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
               <Button
                 type="button"
                 onClick={avancar}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 Próximo
                 <ChevronRight className="h-4 w-4 ml-1" />

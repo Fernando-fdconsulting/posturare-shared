@@ -98,7 +98,7 @@ function SignaturePad({ value, onChange }) {
 
   return (
     <div ref={containerRef} className="w-full">
-      <div className="relative rounded-md border border-white/10 overflow-hidden touch-none">
+      <div className="relative rounded-md border border-input overflow-hidden touch-none">
         <canvas
           ref={canvasRef}
           className="w-full block cursor-crosshair touch-none"
@@ -111,7 +111,7 @@ function SignaturePad({ value, onChange }) {
           onTouchEnd={end}
         />
         {!hasStroke && (
-          <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
+          <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">
             Assine aqui com o dedo ou mouse
           </span>
         )}
@@ -119,7 +119,7 @@ function SignaturePad({ value, onChange }) {
       <button
         type="button"
         onClick={limpar}
-        className="mt-2 inline-flex items-center gap-1 text-xs text-gray-400 hover:text-white"
+        className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
       >
         <Eraser className="h-3.5 w-3.5" />
         Limpar assinatura
