@@ -124,9 +124,39 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
       if (!data.cpf_informado || !validateCPF(data.cpf_informado)) return 'CPF inválido.';
       if (removeMask(data.telefone_informado).length < 10) return 'Telefone inválido.';
       if (!data.data_nascimento) return 'Data de nascimento é obrigatória.';
+      if (!data.profissao.trim()) return 'Profissão é obrigatória.';
+      if (!data.estado_civil) return 'Estado civil é obrigatório.';
+      if (!data.como_conheceu) return 'Como nos conheceu é obrigatório.';
+    }
+    if (s === 'endereco') {
+      if (removeMask(data.cep).length !== 8) return 'CEP é obrigatório.';
+      if (!data.endereco.trim()) return 'Endereço é obrigatório.';
+      if (!data.endereco_numero.trim()) return 'Número é obrigatório.';
+      if (!data.bairro.trim()) return 'Bairro é obrigatório.';
+      if (!data.cidade.trim()) return 'Cidade é obrigatória.';
+      if (!data.estado.trim()) return 'UF é obrigatória.';
+    }
+    if (s === 'saude') {
+      if (data.tem_plano_saude) {
+        if (!data.qual_plano_saude.trim()) return 'Informe qual é o plano de saúde.';
+        if (!data.plano_oferece_reembolso) return 'Informe se o plano oferece reembolso.';
+        if (!data.interesse_reembolso) return 'Informe seu interesse em reembolso.';
+      }
+    }
+    if (s === 'dor') {
+      if (data.tem_dor_desconforto) {
+        if (!data.local_dor.trim()) return 'Informe o local da dor.';
+        if (data.intensidade_dor === '' || data.intensidade_dor === null) return 'Informe a intensidade da dor.';
+        if (!data.tempo_dor.trim()) return 'Informe há quanto tempo sente a dor.';
+      }
+    }
+    if (s === 'historico') {
+      if (!data.atividade_fisica_atual.trim()) return 'Informe sua atividade física atual (ou "Nenhuma").';
+      if (data.praticou_pilates && !data.tempo_pilates.trim()) return 'Informe por quanto tempo praticou Pilates.';
     }
     if (s === 'objetivos') {
       if (!data.objetivo_principal) return 'Objetivo principal é obrigatório.';
+      if (!data.qualidade_vida) return 'Qualidade de vida é obrigatória.';
     }
     if (s === 'termo') {
       if (!data.aceite_termo) return 'É necessário aceitar o termo para concluir.';
@@ -256,7 +286,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
             />
           </div>
           <div className="space-y-2">
-            <Label>Profissão</Label>
+            <Label>Profissão *</Label>
             <Input
               value={data.profissao}
               onChange={(e) => update('profissao', e.target.value)}
@@ -265,7 +295,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Estado civil</Label>
+            <Label>Estado civil *</Label>
             <select
               value={data.estado_civil}
               onChange={(e) => update('estado_civil', e.target.value)}
@@ -280,7 +310,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
             </select>
           </div>
           <div className="space-y-2">
-            <Label>Como nos conheceu?</Label>
+            <Label>Como nos conheceu? *</Label>
             <select
               value={data.como_conheceu}
               onChange={(e) => update('como_conheceu', e.target.value)}
@@ -306,7 +336,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label>CEP</Label>
+            <Label>CEP *</Label>
             <div className="relative">
               <Input
                 value={formatCEP(data.cep)}
@@ -320,7 +350,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
             </div>
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <Label>Endereço</Label>
+            <Label>Endereço *</Label>
             <Input
               value={data.endereco}
               onChange={(e) => update('endereco', e.target.value)}
@@ -329,7 +359,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label>Número</Label>
+            <Label>Número *</Label>
             <Input
               value={data.endereco_numero}
               onChange={(e) => update('endereco_numero', e.target.value)}
@@ -343,7 +373,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
             />
           </div>
           <div className="space-y-2">
-            <Label>Bairro</Label>
+            <Label>Bairro *</Label>
             <Input
               value={data.bairro}
               onChange={(e) => update('bairro', e.target.value)}
@@ -352,14 +382,14 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-2 sm:col-span-2">
-            <Label>Cidade</Label>
+            <Label>Cidade *</Label>
             <Input
               value={data.cidade}
               onChange={(e) => update('cidade', e.target.value)}
             />
           </div>
           <div className="space-y-2">
-            <Label>UF</Label>
+            <Label>UF *</Label>
             <Input
               value={data.estado}
               onChange={(e) => update('estado', e.target.value.toUpperCase().slice(0, 2))}
@@ -425,7 +455,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           {data.tem_plano_saude && (
             <div className="space-y-4 pl-6">
               <div className="space-y-2">
-                <Label>Qual plano?</Label>
+                <Label>Qual plano? *</Label>
                 <Input
                   value={data.qual_plano_saude}
                   onChange={(e) => update('qual_plano_saude', e.target.value)}
@@ -433,7 +463,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>O plano oferece reembolso?</Label>
+                  <Label>O plano oferece reembolso? *</Label>
                   <select
                     value={data.plano_oferece_reembolso}
                     onChange={(e) => update('plano_oferece_reembolso', e.target.value)}
@@ -446,7 +476,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Tem interesse em usar reembolso?</Label>
+                  <Label>Tem interesse em usar reembolso? *</Label>
                   <select
                     value={data.interesse_reembolso}
                     onChange={(e) => update('interesse_reembolso', e.target.value)}
@@ -480,7 +510,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
         {data.tem_dor_desconforto && (
           <div className="space-y-4 pl-6">
             <div className="space-y-2">
-              <Label>Local da dor</Label>
+              <Label>Local da dor *</Label>
               <Input
                 value={data.local_dor}
                 onChange={(e) => update('local_dor', e.target.value)}
@@ -489,7 +519,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Intensidade (0–10)</Label>
+                <Label>Intensidade (0–10) *</Label>
                 <Input
                   type="number"
                   min={0}
@@ -499,7 +529,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
                 />
               </div>
               <div className="space-y-2">
-                <Label>Há quanto tempo?</Label>
+                <Label>Há quanto tempo? *</Label>
                 <Input
                   value={data.tempo_dor}
                   onChange={(e) => update('tempo_dor', e.target.value)}
@@ -599,7 +629,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
         </div>
 
         <div className="space-y-2">
-          <Label>Pratica atividade física atualmente?</Label>
+          <Label>Pratica atividade física atualmente? *</Label>
           <textarea
             value={data.atividade_fisica_atual}
             onChange={(e) => update('atividade_fisica_atual', e.target.value)}
@@ -618,7 +648,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           </label>
           {data.praticou_pilates && (
             <div className="space-y-2 pl-6">
-              <Label>Por quanto tempo?</Label>
+              <Label>Por quanto tempo? *</Label>
               <Input
                 value={data.tempo_pilates}
                 onChange={(e) => update('tempo_pilates', e.target.value)}
@@ -650,7 +680,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           </select>
         </div>
         <div className="space-y-2">
-          <Label>Como avalia sua qualidade de vida hoje?</Label>
+          <Label>Como avalia sua qualidade de vida hoje? *</Label>
           <select
             value={data.qualidade_vida}
             onChange={(e) => update('qualidade_vida', e.target.value)}
