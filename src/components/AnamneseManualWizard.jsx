@@ -22,6 +22,21 @@ const stripDDI55 = (tel) => {
   return limpo;
 };
 
+// Perguntas do questionário de contraindicações (Bota Pneumática / Drenagem Mecânica / Pilates)
+// Baseado no formulário físico "Questionário e Termo de Responsabilidade – Drenagem Linfática Mecânica"
+const PERGUNTAS_CONTRAINDICACAO = [
+  { key: 'contraindicacao_gravidez', label: 'Gravidez ou suspeita?' },
+  { key: 'contraindicacao_varizes_trombose', label: 'Varizes calibrosas, flebites ou trombose?' },
+  { key: 'contraindicacao_cardiaca_hipertensao', label: 'Insuficiência cardíaca ou hipertensão não controlada?' },
+  { key: 'contraindicacao_marcapasso', label: 'Marcapasso ou dispositivos implantados?' },
+  { key: 'contraindicacao_oncologico_cirurgia', label: 'Tratamento oncológico ou cirurgia há menos de 60 dias?' },
+  { key: 'contraindicacao_infeccao_ferida', label: 'Infecção, ferida aberta ou inflamação nas pernas?' },
+  { key: 'contraindicacao_renal_hepatica_linfedema', label: 'Insuficiência renal/hepática ou linfedema não controlado?' },
+  { key: 'contraindicacao_dor_formigamento', label: 'Dor, formigamento ou alteração de sensibilidade?' },
+  { key: 'contraindicacao_anticoagulantes', label: 'Uso de anticoagulantes?' },
+  { key: 'contraindicacao_outras', label: 'Outras condições importantes?' },
+];
+
 /**
  * Wizard multi-step de Anamnese — reutilizável entre posturare-crm e posturare-app.
  *
@@ -67,6 +82,19 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
 
     doenca_diagnosticada: '',
     medicacao_continua: '',
+
+    contraindicacao_gravidez: '',
+    contraindicacao_varizes_trombose: '',
+    contraindicacao_cardiaca_hipertensao: '',
+    contraindicacao_marcapasso: '',
+    contraindicacao_oncologico_cirurgia: '',
+    contraindicacao_infeccao_ferida: '',
+    contraindicacao_renal_hepatica_linfedema: '',
+    contraindicacao_dor_formigamento: '',
+    contraindicacao_anticoagulantes: '',
+    contraindicacao_outras: '',
+    contraindicacao_outras_detalhe: '',
+
     tem_plano_saude: false,
     qual_plano_saude: '',
     plano_oferece_reembolso: '',
@@ -107,6 +135,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
       { id: 'identificacao', label: 'Identificação' },
       { id: 'endereco', label: 'Endereço & Emergência' },
       { id: 'saude', label: 'Saúde' },
+      { id: 'contraindicacoes', label: 'Contraindicações' },
       { id: 'dor', label: 'Dor / Desconforto' },
       { id: 'historico', label: 'Histórico' },
       { id: 'objetivos', label: 'Objetivos' },
@@ -141,6 +170,13 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
         if (!data.qual_plano_saude.trim()) return 'Informe qual é o plano de saúde.';
         if (!data.plano_oferece_reembolso) return 'Informe se o plano oferece reembolso.';
         if (!data.interesse_reembolso) return 'Informe seu interesse em reembolso.';
+      }
+    }
+    if (s === 'contraindicacoes') {
+      const naoRespondida = PERGUNTAS_CONTRAINDICACAO.some((p) => !data[p.key]);
+      if (naoRespondida) return 'Responda todas as perguntas do questionário de contraindicações.';
+      if (data.contraindicacao_outras === 'sim' && !data.contraindicacao_outras_detalhe.trim()) {
+        return 'Informe qual é a outra condição.';
       }
     }
     if (s === 'dor') {
@@ -193,6 +229,10 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
       assinatura_digital: data.nome_completo_informado,
     };
 
+    PERGUNTAS_CONTRAINDICACAO.forEach((p) => {
+      payload[p.key] = data[p.key] === 'sim' ? true : data[p.key] === 'nao' ? false : null;
+    });
+
     Object.keys(payload).forEach((k) => {
       if (payload[k] === '') payload[k] = null;
     });
@@ -241,6 +281,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
     if (s === 'identificacao') return renderIdentificacao();
     if (s === 'endereco') return renderEndereco();
     if (s === 'saude') return renderSaude();
+    if (s === 'contraindicacoes') return renderContraindicacoes();
     if (s === 'dor') return renderDor();
     if (s === 'historico') return renderHistorico();
     if (s === 'objetivos') return renderObjetivos();
@@ -496,6 +537,57 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
     );
   }
 
+  function renderContraindicacoes() {
+    return (
+      <div className="space-y-4">
+        <p className="text-sm text-muted-foreground">
+          Essas perguntas ajudam a equipe a avaliar contraindicações antes de procedimentos como
+          Pilates e Drenagem Mecânica (Bota Pneumática).
+        </p>
+        <div className="space-y-1">
+          {PERGUNTAS_CONTRAINDICACAO.map((p) => (
+            <div
+              key={p.key}
+              className="flex items-center justify-between gap-4 py-2 border-b border-border last:border-0"
+            >
+              <Label className="flex-1 font-normal">{p.label} *</Label>
+              <div className="flex gap-2 shrink-0">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={data[p.key] === 'sim' ? 'default' : 'outline'}
+                  className={data[p.key] === 'sim' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''}
+                  onClick={() => update(p.key, 'sim')}
+                >
+                  Sim
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={data[p.key] === 'nao' ? 'default' : 'outline'}
+                  className={data[p.key] === 'nao' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''}
+                  onClick={() => update(p.key, 'nao')}
+                >
+                  Não
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {data.contraindicacao_outras === 'sim' && (
+          <div className="space-y-2">
+            <Label>Se sim, qual? *</Label>
+            <Input
+              value={data.contraindicacao_outras_detalhe}
+              onChange={(e) => update('contraindicacao_outras_detalhe', e.target.value)}
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   function renderDor() {
     return (
       <div className="space-y-4">
@@ -722,9 +814,27 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
             Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018), armazenados de forma
             segura e utilizados apenas pela equipe responsável pelo meu atendimento.
           </p>
-          <p>
+          <p className="mb-2">
             Posso, a qualquer momento, solicitar a correção ou exclusão dos meus dados, salvo
             obrigação legal de retenção.
+          </p>
+
+          <p className="mb-2 mt-4 font-semibold text-foreground">Termo de Responsabilidade sobre Procedimentos</p>
+          <p className="mb-2">
+            Fui orientado(a) sobre os benefícios, contraindicações e cuidados dos procedimentos
+            oferecidos pela clínica (incluindo Pilates, Drenagem Linfática/Mecânica e demais
+            terapias).
+          </p>
+          <p className="mb-2">
+            Estou ciente de que os procedimentos realizados não substituem acompanhamento médico.
+          </p>
+          <p className="mb-2">
+            Comunicarei qualquer desconforto imediatamente ao profissional responsável durante a
+            sessão.
+          </p>
+          <p>
+            Autorizo a realização dos procedimentos sob minha responsabilidade, com base nas
+            informações de saúde declaradas neste formulário.
           </p>
         </div>
 
@@ -735,7 +845,8 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
             className="mt-1"
           />
           <span className="text-sm">
-            Li e concordo com o termo de consentimento e tratamento de dados (LGPD). *
+            Li e concordo com os termos de consentimento, responsabilidade sobre procedimentos e
+            tratamento de dados (LGPD) acima. *
           </span>
         </label>
 
