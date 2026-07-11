@@ -39,6 +39,8 @@ export {
 
 export { fetchAddressByCEP } from './utils/viaCepService';
 
+export { abrirImpressaoAnamnese } from './utils/gerarAnamnesePDF';
+
 export {
   getAnamneseStatus,
   getPendenciasRevisao,
