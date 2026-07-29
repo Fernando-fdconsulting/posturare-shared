@@ -66,6 +66,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
     telefone_informado: stripDDI55(dadosIniciais.telefone),
     data_nascimento: '',
     profissao: '',
+    sexo_biologico: '',
     estado_civil: '',
     como_conheceu: '',
 
@@ -154,6 +155,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
       if (removeMask(data.telefone_informado).length < 10) return 'Telefone inválido.';
       if (!data.data_nascimento) return 'Data de nascimento é obrigatória.';
       if (!data.profissao.trim()) return 'Profissão é obrigatória.';
+      if (!data.sexo_biologico) return 'Sexo biológico é obrigatório.';
       if (!data.estado_civil) return 'Estado civil é obrigatório.';
       if (!data.como_conheceu) return 'Como nos conheceu é obrigatório.';
     }
@@ -227,6 +229,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
       contato_emergencia_telefone: removeMask(data.contato_emergencia_telefone),
       intensidade_dor: data.intensidade_dor ? parseInt(data.intensidade_dor, 10) : null,
       assinatura_digital: data.nome_completo_informado,
+      sexo_biologico_origem: 'declarado',
     };
 
     PERGUNTAS_CONTRAINDICACAO.forEach((p) => {
@@ -336,6 +339,19 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
+            <Label>Sexo biológico *</Label>
+            <select
+              value={data.sexo_biologico}
+              onChange={(e) => update('sexo_biologico', e.target.value)}
+              className={selectCls}
+            >
+              <option value="">Selecione...</option>
+              <option value="Masculino">Masculino</option>
+              <option value="Feminino">Feminino</option>
+              <option value="Prefiro não informar">Prefiro não informar</option>
+            </select>
+          </div>
+          <div className="space-y-2">
             <Label>Estado civil *</Label>
             <select
               value={data.estado_civil}
@@ -350,6 +366,8 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
               <option value="Viúvo(a)">Viúvo(a)</option>
             </select>
           </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Como nos conheceu? *</Label>
             <select

@@ -137,6 +137,7 @@ function montarHTML(a) {
     ${linha('CPF', a.cpf_informado ? formatCPF(a.cpf_informado) : '—')}
     ${linha('Telefone', a.telefone_informado ? formatarTelefoneExibicao(a.telefone_informado) : '—')}
     ${linha('Data de nascimento', fmtDataSimples(a.data_nascimento))}
+    ${linha('Sexo biológico', a.sexo_biologico)}
     ${linha('Profissão', a.profissao)}
     ${linha('Estado civil', a.estado_civil)}
     ${linha('Como conheceu', a.como_conheceu)}
