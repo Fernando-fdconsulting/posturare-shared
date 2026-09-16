@@ -46,7 +46,7 @@ const PERGUNTAS_CONTRAINDICACAO = [
  * no index.css de cada projeto.
  *
  * Props:
- * - dadosIniciais: { nome, cpf, telefone }    -> valores atuais do lead/cliente (pré-preencher campos sensíveis)
+ * - dadosIniciais: { nome, cpf, telefone, email }    -> valores atuais do lead/cliente (pré-preencher campos)
  * - modo: 'manual' (CRM) | 'publico' (app público)
  * - onSubmit: async (payload) => void          -> pai decide se chama RPC, insert direto, etc.
  *     payload usa os nomes de campo do banco anamnese_paciente (ex.: nome_completo_informado, cpf_informado...).
@@ -64,6 +64,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
     nome_completo_informado: dadosIniciais.nome || '',
     cpf_informado: dadosIniciais.cpf || '',
     telefone_informado: stripDDI55(dadosIniciais.telefone),
+    email: dadosIniciais.email || '',
     data_nascimento: '',
     profissao: '',
     sexo_biologico: '',
@@ -153,6 +154,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
       if (!data.nome_completo_informado.trim()) return 'Nome completo é obrigatório.';
       if (!data.cpf_informado || !validateCPF(data.cpf_informado)) return 'CPF inválido.';
       if (removeMask(data.telefone_informado).length < 10) return 'Telefone inválido.';
+      if (data.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) return 'Email inválido.';
       if (!data.data_nascimento) return 'Data de nascimento é obrigatória.';
       if (!data.profissao.trim()) return 'Profissão é obrigatória.';
       if (!data.sexo_biologico) return 'Sexo biológico é obrigatório.';
@@ -319,6 +321,15 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
               placeholder="(11) 99999-9999"
             />
           </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Email</Label>
+          <Input
+            type="email"
+            value={data.email}
+            onChange={(e) => update('email', e.target.value)}
+            placeholder="seuemail@exemplo.com"
+          />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
