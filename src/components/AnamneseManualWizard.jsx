@@ -147,6 +147,9 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
   );
 
   const progresso = Math.round(((step + 1) / steps.length) * 100);
+  // No app público o campo é apresentado como "Gênero" (termo mais neutro p/ o paciente);
+  // no CRM/prontuário (modo manual) permanece "Sexo biológico". Mesma coluna no banco.
+  const generoLabel = modo === 'publico' ? 'Gênero' : 'Sexo biológico';
 
   const validarPasso = () => {
     const s = steps[step].id;
@@ -157,7 +160,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
       if (data.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) return 'Email inválido.';
       if (!data.data_nascimento) return 'Data de nascimento é obrigatória.';
       if (!data.profissao.trim()) return 'Profissão é obrigatória.';
-      if (!data.sexo_biologico) return 'Sexo biológico é obrigatório.';
+      if (!data.sexo_biologico) return `${generoLabel} é obrigatório.`;
       if (!data.estado_civil) return 'Estado civil é obrigatório.';
       if (!data.como_conheceu) return 'Como nos conheceu é obrigatório.';
     }
@@ -323,7 +326,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Email</Label>
+          <Label>Email <span className="font-normal text-muted-foreground">(opcional)</span></Label>
           <Input
             type="email"
             value={data.email}
@@ -350,7 +353,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Sexo biológico *</Label>
+            <Label>{generoLabel} *</Label>
             <select
               value={data.sexo_biologico}
               onChange={(e) => update('sexo_biologico', e.target.value)}
@@ -436,7 +439,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
             />
           </div>
           <div className="space-y-2">
-            <Label>Complemento</Label>
+            <Label>Complemento <span className="font-normal text-muted-foreground">(opcional)</span></Label>
             <Input
               value={data.complemento}
               onChange={(e) => update('complemento', e.target.value)}
@@ -472,14 +475,14 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           <h4 className="font-semibold mb-3">Contato de emergência</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Nome</Label>
+              <Label>Nome <span className="font-normal text-muted-foreground">(opcional)</span></Label>
               <Input
                 value={data.contato_emergencia_nome}
                 onChange={(e) => update('contato_emergencia_nome', e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label>Telefone</Label>
+              <Label>Telefone <span className="font-normal text-muted-foreground">(opcional)</span></Label>
               <Input
                 value={formatPhone(data.contato_emergencia_telefone)}
                 onChange={(e) => update('contato_emergencia_telefone', e.target.value)}
@@ -496,7 +499,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
     return (
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label>Possui alguma doença diagnosticada?</Label>
+          <Label>Possui alguma doença diagnosticada? <span className="font-normal text-muted-foreground">(opcional)</span></Label>
           <textarea
             value={data.doenca_diagnosticada}
             onChange={(e) => update('doenca_diagnosticada', e.target.value)}
@@ -505,7 +508,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           />
         </div>
         <div className="space-y-2">
-          <Label>Faz uso contínuo de alguma medicação?</Label>
+          <Label>Faz uso contínuo de alguma medicação? <span className="font-normal text-muted-foreground">(opcional)</span></Label>
           <textarea
             value={data.medicacao_continua}
             onChange={(e) => update('medicacao_continua', e.target.value)}
@@ -735,7 +738,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
         )}
 
         <div className="space-y-2">
-          <Label>Tem interesse em fisioterapia?</Label>
+          <Label>Tem interesse em fisioterapia? <span className="font-normal text-muted-foreground">(opcional)</span></Label>
           <select
             value={data.interesse_fisioterapia}
             onChange={(e) => update('interesse_fisioterapia', e.target.value)}
@@ -816,7 +819,7 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
           </select>
         </div>
         <div className="space-y-2">
-          <Label>Observações adicionais</Label>
+          <Label>Observações adicionais <span className="font-normal text-muted-foreground">(opcional)</span></Label>
           <textarea
             value={data.observacoes_adicionais}
             onChange={(e) => update('observacoes_adicionais', e.target.value)}
@@ -945,6 +948,12 @@ function AnamneseManualWizard({ dadosIniciais = {}, modo = 'manual', onSubmit, o
 
           <div className="px-4 sm:px-6 pt-4">
             <Progress value={progresso} className="h-1.5" />
+          </div>
+
+          <div className="px-4 sm:px-6 pt-2">
+            <p className="text-xs text-muted-foreground">
+              <span className="text-destructive font-medium">*</span> Requerido · os demais campos são opcionais
+            </p>
           </div>
 
           <div className="overflow-y-auto p-4 sm:p-6">{renderStep()}</div>
